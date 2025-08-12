@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0d1117">
+    <title>Alquimista Mestre: A Jornada Cósmica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Inter:wght@400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #58a6ff;
+            --secondary: #f97316;
+            --success: #4ade80;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+            --dark: #0d1117;
+            --darker: #010409;
+            --light: #c9d1d9;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            touch-action: manipulation;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="%2358a6ff" opacity="0.3"/><circle cx="80" cy="40" r="0.5" fill="%23f97316" opacity="0.4"/><circle cx="40" cy="80" r="0.8" fill="%234ade80" opacity="0.3"/><circle cx="90" cy="90" r="0.6" fill="%23f87171" opacity="0.4"/></svg>');
+            background-size: 200px 200px;
+            animation: stars 120s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes stars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-200px); }
+        }
+
+        .medieval-title {
+            font-family: 'MedievalSharp', cursive;
+            text-shadow: 0 0 20px rgba(88, 166, 255, 0.5);
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+
+        .element-card {
+            cursor: grab;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #30363d;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .element-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .element-card:active, .element-card.selected {
+            cursor: grabbing;
+            transform: scale(1.1) rotateY(5deg);
+            box-shadow: 0 0 30px rgba(88, 166, 255, 0.8), 0 10px 30px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+            border-color: var(--primary);
+        }
+
+        .element-card:active::before, .element-card.selected::before {
+            opacity: 1;
+        }
+
+        .beaker {
+            border: 3px dashed #30363d;
+            transition: all 0.3s;
+            background: radial-gradient(ellipse at center, rgba(88, 166, 255, 0.05) 0%, transparent 70%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .beaker::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+            border-radius: 50%;
+        }
+
+        .beaker.drag-over::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .beaker.drag-over {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.5);
+        }
+
+        .shake {
+            animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
+        .element-emoji {
+            font-size: 2.5rem;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .beaker-content {
+            font-size: 3rem;
+            transition: all 0.3s;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+        }
+
+        .newly-discovered {
+            animation: pop-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes pop-in {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+
+        .win-message {
+            animation: fadeIn 1s ease-in, pulse 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0;
+            animation: particle-float 3s ease-out forwards;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .category-header {
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0 8px 0;
+            grid-column: 1 / -1;
+            text-align: left;
+            padding-left: 8px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+            transform: translateX(-100%);
+            animation: slide-in 0.5s ease-out forwards;
+        }
+
+        @keyframes slide-in {
+            to { transform: translateX(0); }
+        }
+
+        .category-icon {
+            font-size: 1.2rem;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(88, 166, 255, 0.8), 0 0 40px rgba(88, 166, 255, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(88, 166, 255, 1), 0 0 60px rgba(88, 166, 255, 0.6); }
+        }
+
+        .level-progress {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            background: linear-gradient(135deg, #1c2128 0%, #30363d 100%);
+            border: 2px solid var(--warning);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: right 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .achievement-popup.show {
+            right: 20px;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .floating-button:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .floating-button:active {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modal-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes modal-pop {
+            0% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .power-up {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--warning) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .combo-meter {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--warning);
+            text-shadow: 0 0 30px rgba(249, 115, 22, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 500;
+        }
+
+        .combo-meter.show {
+            animation: combo-burst 1s ease-out;
+        }
+
+        @keyframes combo-burst {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+        }
+
+        .haptic-feedback {
+            animation: vibrate 0.1s;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .dark-mode {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        .dark-mode .element-emoji,
+        .dark-mode .beaker-content {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.5);
+        }
+
+        .music-control.playing {
+            background: rgba(88, 166, 255, 0.3);
+        }
+
+        .music-visualizer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            padding: 0 20px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .music-bar {
+            width: 4px;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        @media (max-width: 640px) {
+            .element-emoji { font-size: 2rem; }
+            .beaker-content { font-size: 2.5rem; }
+            .category-header { font-size: 0.9rem; }
+            .modal-content { padding: 20px; }
+            .music-control { width: 40px; height: 40px; }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <!-- Controle de música -->
+    <div id="music-control" class="music-control" title="Música de Fundo">
+        <i class="fas fa-music text-white"></i>
+    </div>
+
+    <!-- Visualizador de música -->
+    <div id="music-visualizer" class="music-visualizer">
+        <!-- Barras serão geradas dinamicamente -->
+    </div>
+
+    <!-- Cabeçalho com informações do jogador -->
+    <div class="w-full max-w-6xl mx-auto mb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="text-center sm:text-left">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl medieval-title text-blue-400 mb-1">Alquimista Mestre</h1>
+                <p class="text-sm sm:text-base text-gray-400">A Jornada Cósmica</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">Nível</div>
+                    <div class="text-2xl font-bold orbitron text-yellow-400" id="player-level">1</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">XP</div>
+                    <div class="level-progress w-24 bg-gray-700 rounded-full overflow-hidden">
+                        <div id="xp-bar" class="h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">Combo</div>
+                    <div class="text-2xl font-bold orbitron text-orange-400" id="combo-count">x1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área principal do jogo -->
+    <div class="w-full max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Coluna de Elementos -->
+            <div class="lg:col-span-2 bg-gray-800/30 backdrop-blur-sm p-6 rounded-2xl shadow-2xl border border-gray-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl medieval-title text-blue-300">Elementos Descobertos</h2>
+                    <div class="flex items-center gap-2">
+                        <span id="element-count" class="text-lg font-semibold bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full"></span>
+                        <button id="filter-btn" class="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="elements-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-2 min-h-[300px] max-h-[60vh] overflow-y-auto">
+                    <!-- Elementos serão inseridos aqui -->
+                </div>
+            </div>
+
+            <!-- Coluna da Alquimia -->
+            <div class="bg-gray-800/30 backdrop-blur-sm p-6 rounded-2xl shadow-2xl flex flex-col items-center border border-gray-700">
+                <h2 class="text-2xl medieval-title text-blue-300 mb-4">Caldeirão Cósmico</h2>
+                <div id="beaker" class="beaker w-full h-56 rounded-xl flex items-center justify-center relative">
+                    <div id="beaker-content" class="beaker-content flex gap-4">
+                        <!-- Emojis dos elementos aparecerão aqui -->
+                    </div>
+                    <div class="beaker-hint absolute top-2 right-2 bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">
+                        Solte aqui
+                    </div>
+                </div>
+                <p id="feedback-message" class="mt-4 text-center text-blue-300 h-6 font-semibold"></p>
+                
+                <!-- Botões de ação -->
+                <div class="flex flex-col gap-3 mt-4 w-full">
+                    <button id="hint-button" class="bg-purple-600/80 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 w-full flex items-center justify-center gap-2 transform hover:scale-105">
+                        <i class="fas fa-lightbulb"></i> Dica Mística
+                    </button>
+                    <button id="power-button" class="bg-yellow-600/80 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 w-full flex items-center justify-center gap-2 transform hover:scale-105">
+                        <i class="fas fa-bolt"></i> Poder Cósmico
+                    </button>
+                    <button id="reset-button" class="bg-red-600/80 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 w-full flex items-center justify-center gap-2 transform hover:scale-105">
+                        <i class="fas fa-redo"></i> Reiniciar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões flutuantes -->
+    <button id="menu-button" class="floating-button" style="bottom: 90px;">
+        <i class="fas fa-bars"></i>
+    </button>
+    <button id="scroll-to-top" class="floating-button" style="bottom: 160px; opacity: 0; visibility: hidden;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Popup de conquista -->
+    <div id="achievement-popup" class="achievement-popup">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-trophy text-3xl text-yellow-400"></i>
+            <div>
+                <h3 class="font-bold text-lg">Conquista Desbloqueada!</h3>
+                <p id="achievement-text" class="text-sm text-gray-300"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de menu -->
+    <div id="menu-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl medieval-title text-blue-400 mb-6">Menu Principal</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <button class="menu-item bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition-all transform hover:scale-105">
+                    <i class="fas fa-trophy text-3xl text-yellow-400 mb-2"></i>
+                    <p>Conquistas</p>
+                </button>
+                <button class="menu-item bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition-all transform hover:scale-105">
+                    <i class="fas fa-chart-line text-3xl text-green-400 mb-2"></i>
+                    <p>Estatísticas</p>
+                </button>
+                <button class="menu-item bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition-all transform hover:scale-105">
+                    <i class="fas fa-moon text-3xl text-purple-400 mb-2"></i>
+                    <p>Modo Noturno</p>
+                </button>
+                <button class="menu-item bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition-all transform hover:scale-105">
+                    <i class="fas fa-share-alt text-3xl text-blue-400 mb-2"></i>
+                    <p>Compartilhar</p>
+                </button>
+            </div>
+            <button id="close-menu" class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- Medidor de combo -->
+    <div id="combo-meter" class="combo-meter"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- SISTEMA DE MÚSICA 16-BIT ---
+            class Music16Bit {
+                constructor() {
+                    this.isPlaying = false;
+                    this.currentPattern = 0;
+                    this.currentStep = 0;
+                    this.tempo = 120;
+                    this.patterns = [];
+                    this.melodySynth = null;
+                    this.bassSynth = null;
+                    this.drumSynth = null;
+                    this.chordSynth = null;
+                    this.visualizerBars = [];
+                    
+                    this.init();
+                }
+
+                init() {
+                    // Criar visualizador
+                    this.createVisualizer();
+                    
+                    // Sintetizadores 8-bit/16-bit
+                    this.melodySynth = new Tone.Synth({
+                        oscillator: { type: 'square' },
+                        envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.1 }
+                    }).toDestination();
+                    
+                    this.bassSynth = new Tone.Synth({
+                        oscillator: { type: 'sawtooth' },
+                        envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.1 }
+                    }).toDestination();
+                    
+                    this.drumSynth = new Tone.MembraneSynth({
+                        pitchDecay: 0.01,
+                        octaves: 2,
+                        oscillator: { type: 'sine' }
+                    }).toDestination();
+                    
+                    this.chordSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: 'triangle' },
+                        envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.2 }
+                    }).toDestination();
+                    
+                    // Gerar padrões musicais
+                    this.generatePatterns();
+                    
+                    // Configurar transporte
+                    Tone.Transport.bpm.value = this.tempo;
+                    Tone.Transport.timeSignature = [4, 4];
+                    
+                    // Iniciar sequenciador
+                    this.setupSequencer();
+                }
+
+                createVisualizer() {
+                    const visualizer = document.getElementById('music-visualizer');
+                    for (let i = 0; i < 30; i++) {
+                        const bar = document.createElement('div');
+                        bar.className = 'music-bar';
+                        bar.style.height = '5px';
+                        visualizer.appendChild(bar);
+                        this.visualizerBars.push(bar);
+                    }
+                }
+
+                generatePatterns() {
+                    // Escalas para diferentes níveis
+                    const scales = {
+                        1: ['C4', 'D4', 'E4', 'G4', 'A4'],
+                        2: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4'],
+                        3: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'],
+                        4: ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4']
+                    };
+
+                    // Padrões melódicos
+                    this.patterns = [
+                        {
+                            name: 'Exploração',
+                            melody: this.generateMelody(scales[1], 16),
+                            bass: this.generateBass(['C2', 'G2', 'A2'], 16),
+                            chords: this.generateChords(['C3', 'G3', 'A3'], 16),
+                            drums: this.generateDrums(16)
+                        },
+                        {
+                            name: 'Descoberta',
+                            melody: this.generateMelody(scales[2], 16),
+                            bass: this.generateBass(['C2', 'F2', 'G2'], 16),
+                            chords: this.generateChords(['C3', 'F3', 'G3'], 16),
+                            drums: this.generateDrums(16)
+                        },
+                        {
+                            name: 'Progressão',
+                            melody: this.generateMelody(scales[3], 16),
+                            bass: this.generateBass(['C2', 'D2', 'E2', 'G2'], 16),
+                            chords: this.generateChords(['C3', 'D3', 'E3', 'G3'], 16),
+                            drums: this.generateDrums(16)
+                        },
+                        {
+                            name: 'Mestre',
+                            melody: this.generateMelody(scales[4], 16),
+                            bass: this.generateBass(['C2', 'D2', 'E2', 'F2', 'G2'], 16),
+                            chords: this.generateChords(['C3', 'D3', 'E3', 'F3', 'G3'], 16),
+                            drums: this.generateDrums(16)
+                        }
+                    ];
+                }
+
+                generateMelody(scale, length) {
+                    const melody = [];
+                    for (let i = 0; i < length; i++) {
+                        if (Math.random() > 0.3) {
+                            const note = scale[Math.floor(Math.random() * scale.length)];
+                            melody.push(note);
+                        } else {
+                            melody.push(null);
+                        }
+                    }
+                    return melody;
+                }
+
+                generateBass(notes, length) {
+                    const bass = [];
+                    for (let i = 0; i < length; i++) {
+                        if (i % 4 === 0) {
+                            bass.push(notes[Math.floor(Math.random() * notes.length)]);
+                        } else {
+                            bass.push(null);
+                        }
+                    }
+                    return bass;
+                }
+
+                generateChords(notes, length) {
+                    const chords = [];
+                    for (let i = 0; i < length; i++) {
+                        if (i % 4 === 0) {
+                            const root = notes[Math.floor(Math.random() * notes.length)];
+                            chords.push([root, this.getThird(root), this.getFifth(root)]);
+                        } else {
+                            chords.push(null);
+                        }
+                    }
+                    return chords;
+                }
+
+                generateDrums(length) {
+                    const drums = [];
+                    for (let i = 0; i < length; i++) {
+                        if (i % 4 === 0) {
+                            drums.push('kick');
+                        } else if (i % 2 === 1) {
+                            drums.push('snare');
+                        } else if (Math.random() > 0.7) {
+                            drums.push('hihat');
+                        } else {
+                            drums.push(null);
+                        }
+                    }
+                    return drums;
+                }
+
+                getThird(note) {
+                    const noteMap = {
+                        'C': 'E', 'D': 'F', 'E': 'G', 'F': 'A', 'G': 'B', 'A': 'C', 'B': 'D'
+                    };
+                    const noteName = note.replace(/\d/, '');
+                    const octave = parseInt(note.replace(/\D/, ''));
+                    return noteMap[noteName] + octave;
+                }
+
+                getFifth(note) {
+                    const noteMap = {
+                        'C': 'G', 'D': 'A', 'E': 'B', 'F': 'C', 'G': 'D', 'A': 'E', 'B': 'F'
+                    };
+                    const noteName = note.replace(/\d/, '');
+                    const octave = parseInt(note.replace(/\D/, ''));
+                    return noteMap[noteName] + octave;
+                }
+
+                setupSequencer() {
+                    Tone.Transport.scheduleRepeat((time) => {
+                        if (!this.isPlaying) return;
+                        
+                        const pattern = this.patterns[Math.min(this.currentPattern, this.patterns.length - 1)];
+                        
+                        // Tocar melodia
+                        if (pattern.melody[this.currentStep]) {
+                            this.melodySynth.triggerAttackRelease(pattern.melody[this.currentStep], '8n', time);
+                        }
+                        
+                        // Tocar baixo
+                        if (pattern.bass[this.currentStep]) {
+                            this.bassSynth.triggerAttackRelease(pattern.bass[this.currentStep], '4n', time);
+                        }
+                        
+                        // Tocar acordes
+                        if (pattern.chords[this.currentStep]) {
+                            this.chordSynth.triggerAttackRelease(pattern.chords[this.currentStep], '2n', time);
+                        }
+                        
+                        // Tocar bateria
+                        if (pattern.drums[this.currentStep]) {
+                            const drum = pattern.drums[this.currentStep];
+                            if (drum === 'kick') {
+                                this.drumSynth.triggerAttackRelease('C2', '8n', time);
+                            } else if (drum === 'snare') {
+                                this.drumSynth.triggerAttackRelease('C3', '8n', time);
+                            } else if (drum === 'hihat') {
+                                this.drumSynth.triggerAttackRelease('C5', '16n', time);
+                            }
+                        }
+                        
+                        // Atualizar visualizador
+                        this.updateVisualizer();
+                        
+                        // Avançar passo
+                        this.currentStep = (this.currentStep + 1) % 16;
+                        
+                    }, '16n');
+                }
+
+                updateVisualizer() {
+                    this.visualizerBars.forEach((bar, index) => {
+                        const height = Math.random() * 40 + 10;
+                        bar.style.height = height + 'px';
+                    });
+                }
+
+                play() {
+                    if (!this.isPlaying) {
+                        this.isPlaying = true;
+                        Tone.Transport.start();
+                        document.getElementById('music-control').classList.add('playing');
+                    }
+                }
+
+                stop() {
+                    if (this.isPlaying) {
+                        this.isPlaying = false;
+                        Tone.Transport.stop();
+                        document.getElementById('music-control').classList.remove('playing');
+                        this.visualizerBars.forEach(bar => {
+                            bar.style.height = '5px';
+                        });
+                    }
+                }
+
+                setLevel(level) {
+                    this.currentPattern = Math.min(Math.floor(level / 5), this.patterns.length - 1);
+                    if (this.isPlaying) {
+                        // Ajustar tempo baseado no nível
+                        Tone.Transport.bpm.value = this.tempo + (level * 2);
+                    }
+                }
+
+                playSuccessSound() {
+                    // Melodia de sucesso
+                    const successMelody = ['C5', 'E5', 'G5', 'C6'];
+                    successMelody.forEach((note, index) => {
+                        this.melodySynth.triggerAttackRelease(note, '8n', Tone.now() + index * 0.1);
+                    });
+                }
+
+                playErrorSound() {
+                    // Som de erro
+                    this.drumSynth.triggerAttackRelease('C1', '8n');
+                }
+
+                playAchievementSound() {
+                    // Fanfarra de conquista
+                    const achievementMelody = ['C5', 'C5', 'G5', 'C6', 'G5', 'C6'];
+                    achievementMelody.forEach((note, index) => {
+                        this.melodySynth.triggerAttackRelease(note, '8n', Tone.now() + index * 0.15);
+                    });
+                }
+            }
+
+            // Inicializar sistema de música
+            const musicSystem = new Music16Bit();
+            
+            // Controle de música
+            document.getElementById('music-control').addEventListener('click', () => {
+                if (musicSystem.isPlaying) {
+                    musicSystem.stop();
+                } else {
+                    musicSystem.play();
+                }
+            });
+
+            // --- CONFIGURAÇÃO INICIAL DO JOGO ---
+            const initialElements = { 
+                'água': '💧', 
+                'fogo': '🔥', 
+                'terra': '🌍', 
+                'ar': '💨',
+                'luz': '✨',
+                'sombra': '🌑'
+            };
+            
+            const recipes = {
+                // Combinações básicas
+                'água+fogo': { name: 'vapor', emoji: '💨', xp: 10, category: 'elementais' },
+                'água+terra': { name: 'lama', emoji: '💩', xp: 10, category: 'natureza' },
+                'água+ar': { name: 'chuva', emoji: '🌧️', xp: 15, category: 'natureza' },
+                'fogo+terra': { name: 'lava', emoji: '🌋', xp: 20, category: 'elementais' },
+                'fogo+ar': { name: 'energia', emoji: '⚡', xp: 25, category: 'elementais' },
+                'terra+ar': { name: 'poeira', emoji: '🟫', xp: 10, category: 'elementais' },
+                'luz+sombra': { name: 'equilíbrio', emoji: '⚖️', xp: 50, category: 'místicos' },
+                
+                // Combinações avançadas
+                'lava+ar': { name: 'pedra', emoji: '🪨', xp: 20, category: 'elementais' },
+                'lava+água': { name: 'obsidiana', emoji: '🔮', xp: 30, category: 'místicos' },
+                'pedra+fogo': { name: 'metal', emoji: '🔩', xp: 25, category: 'elementais' },
+                'lama+fogo': { name: 'tijolo', emoji: '🧱', xp: 20, category: 'construções' },
+                'água+pedra': { name: 'areia', emoji: '🏜️', xp: 15, category: 'natureza' },
+                'fogo+areia': { name: 'vidro', emoji: '🥃', xp: 30, category: 'elementais' },
+                
+                // Combinações de vida
+                'terra+chuva': { name: 'planta', emoji: '🌱', xp: 25, category: 'natureza' },
+                'planta+lama': { name: 'pântano', emoji: '🐊', xp: 30, category: 'natureza' },
+                'planta+fogo': { name: 'cinzas', emoji: '⚫', xp: 15, category: 'elementais' },
+                'planta+água': { name: 'alga', emoji: '🌿', xp: 20, category: 'natureza' },
+                'planta+ar': { name: 'dente-de-leão', emoji: '🌼', xp: 20, category: 'natureza' },
+                'planta+planta': { name: 'jardim', emoji: '🌳', xp: 35, category: 'natureza' },
+                'jardim+fogo': { name: 'floresta em chamas', emoji: '🔥🌳', xp: 40, category: 'elementais' },
+                'terra+vida': { name: 'humano', emoji: '🧑', xp: 50, category: 'vida' },
+                
+                // Combinações humanas
+                'humano+metal': { name: 'ferramenta', emoji: '🛠️', xp: 30, category: 'tecnologia' },
+                'humano+pedra': { name: 'cabana', emoji: '🛖', xp: 35, category: 'construções' },
+                'humano+ferramenta': { name: 'engenheiro', emoji: '👷', xp: 40, category: 'profissões' },
+                'humano+humano': { name: 'família', emoji: '👨‍👩‍👧‍👦', xp: 45, category: 'vida' },
+                'tijolo+ferramenta': { name: 'casa', emoji: '🏠', xp: 40, category: 'construções' },
+                'casa+casa': { name: 'vila', emoji: '🏘️', xp: 50, category: 'construções' },
+                
+                // Combinações tecnológicas
+                'energia+metal': { name: 'eletricidade', emoji: '💡', xp: 40, category: 'tecnologia' },
+                'eletricidade+vidro': { name: 'lâmpada', emoji: '💡', xp: 35, category: 'tecnologia' },
+                'eletricidade+humano': { name: 'eletricista', emoji: '🧑‍🔧', xp: 45, category: 'profissões' },
+                'pântano+energia': { name: 'vida', emoji: '🧬', xp: 60, category: 'vida' },
+                
+                // Combinações místicas
+                'vida+pedra': { name: 'ovo', emoji: '🥚', xp: 35, category: 'vida' },
+                'ovo+fogo': { name: 'omelete', emoji: '🍳', xp: 25, category: 'culinária' },
+                'ovo+pântano': { name: 'lagarto', emoji: '🦎', xp: 40, category: 'vida' },
+                'lagarto+ar': { name: 'dragão', emoji: '🐉', xp: 100, category: 'místicos' },
+                'vida+metal': { name: 'robô', emoji: '🤖', xp: 70, category: 'tecnologia' },
+                'robô+humano': { name: 'ciborgue', emoji: '🦾', xp: 80, category: 'tecnologia' },
+                
+                // Combinações cósmicas
+                'luz+energia': { name: 'raio laser', emoji: '🔦', xp: 45, category: 'tecnologia' },
+                'sombra+energia': { name: 'portal', emoji: '🌀', xp: 60, category: 'místicos' },
+                'dragão+luz': { name: 'dragão celestial', emoji: '🐉✨', xp: 150, category: 'místicos' },
+                'dragão+sombra': { name: 'dragão das trevas', emoji: '🐉🌑', xp: 150, category: 'místicos' },
+                'portal+vida': { name: 'viajante dimensional', emoji: '🚀', xp: 100, category: 'místicos' },
+                
+                // Novas combinações épicas
+                'raio laser+vidro': { name: 'prisma', emoji: '🔺', xp: 55, category: 'místicos' },
+                'prisma+luz': { name: 'arco-íris', emoji: '🌈', xp: 60, category: 'natureza' },
+                'arco-íris+água': { name: 'fonte da juventude', emoji: '⛲', xp: 80, category: 'místicos' },
+                'fonte da juventude+humano': { name: 'imortal', emoji: '👤', xp: 120, category: 'místicos' },
+                'imortal+dragão': { name: 'deus alquimista', emoji: '👑', xp: 200, category: 'místicos' },
+                
+                // Combinações culinárias
+                'areia+vida': { name: 'escorpião', emoji: '🦂', xp: 30, category: 'vida' },
+                'água+vida': { name: 'plâncton', emoji: '🦠', xp: 20, category: 'vida' },
+                'plâncton+vida': { name: 'peixe', emoji: '🐟', xp: 25, category: 'vida' },
+                'peixe+pedra': { name: 'fóssil', emoji: '🦴', xp: 35, category: 'natureza' },
+                'humano+peixe': { name: 'pescador', emoji: '🎣', xp: 40, category: 'profissões' },
+                'vapor+metal': { name: 'motor a vapor', emoji: '🚂', xp: 50, category: 'tecnologia' },
+                'motor a vapor+ferramenta': { name: 'trem', emoji: '🚆', xp: 55, category: 'tecnologia' },
+                'vida+jardim': { name: 'animal', emoji: '🐾', xp: 40, category: 'vida' },
+                'animal+ferramenta': { name: 'animal doméstico', emoji: '🐕', xp: 35, category: 'vida' },
+                'animal+fogo': { name: 'churrasco', emoji: '🍖', xp: 30, category: 'culinária' },
+                'humano+animal doméstico': { name: 'amor', emoji: '❤️', xp: 45, category: 'vida' },
+                'humano+planta': { name: 'fazendeiro', emoji: '🧑‍🌾', xp: 40, category: 'profissões' },
+                'fazendeiro+vida': { name: 'gado', emoji: '🐄', xp: 35, category: 'vida' },
+                'gado+grama': { name: 'leite', emoji: '🥛', xp: 25, category: 'culinária' },
+                'planta+terra': { name: 'grama', emoji: '🌾', xp: 15, category: 'natureza' },
+                'leite+fogo': { name: 'queijo', emoji: '🧀', xp: 30, category: 'culinária' },
+                
+                // Combinações finais épicas
+                'deus alquimista+equilíbrio': { name: 'universo', emoji: '🌌', xp: 500, category: 'místicos' },
+                'universo+vida': { name: 'big bang', emoji: '💥', xp: 1000, category: 'místicos' },
+            };
+            
+            // Categorias organizadas com ícones e cores
+            const elementCategories = {
+                'básicos': { 
+                    elements: ['água', 'fogo', 'terra', 'ar', 'luz', 'sombra'], 
+                    icon: 'fa-atom',
+                    color: 'category-básicos'
+                },
+                'natureza': { 
+                    elements: ['lama', 'chuva', 'planta', 'alga', 'dente-de-leão', 'jardim', 'grama', 'pântano', 'arco-íris', 'fonte da juventude'], 
+                    icon: 'fa-leaf',
+                    color: 'category-natureza'
+                },
+                'elementais': { 
+                    elements: ['vapor', 'lava', 'energia', 'pedra', 'areia', 'poeira', 'metal', 'vidro', 'obsidiana', 'cinzas', 'floresta em chamas'], 
+                    icon: 'fa-fire',
+                    color: 'category-elementais'
+                },
+                'construções': { 
+                    elements: ['tijolo', 'casa', 'vila', 'cabana'], 
+                    icon: 'fa-building',
+                    color: 'category-construções'
+                },
+                'tecnologia': { 
+                    elements: ['eletricidade', 'lâmpada', 'motor a vapor', 'trem', 'robô', 'ciborgue', 'raio laser', 'prisma'], 
+                    icon: 'fa-microchip',
+                    color: 'category-tecnologia'
+                },
+                'vida': { 
+                    elements: ['vida', 'ovo', 'humano', 'animal', 'animal doméstico', 'lagarto', 'dragão', 'escorpião', 'plâncton', 'peixe', 'gado', 'família', 'amor', 'imortal'], 
+                    icon: 'fa-dna',
+                    color: 'category-vida'
+                },
+                'culinária': { 
+                    elements: ['omelete', 'leite', 'queijo', 'churrasco'], 
+                    icon: 'fa-utensils',
+                    color: 'category-culinária'
+                },
+                'profissões': { 
+                    elements: ['fazendeiro', 'engenheiro', 'eletricista', 'pescador'], 
+                    icon: 'fa-hard-hat',
+                    color: 'category-profissões'
+                },
+                'místicos': { 
+                    elements: ['equilíbrio', 'obsidiana', 'dragão', 'dragão celestial', 'dragão das trevas', 'portal', 'viajante dimensional', 'deus alquimista', 'universo', 'big bang'], 
+                    icon: 'fa-magic',
+                    color: 'category-místicos'
+                },
+                'outros': { 
+                    elements: ['ferramenta', 'fóssil'], 
+                    icon: 'fa-ellipsis-h',
+                    color: 'category-outros'
+                }
+            };
+            
+            // Conquistas
+            const achievements = {
+                'first_combination': { name: 'Primeiros Passos', description: 'Faça sua primeira combinação', icon: 'fa-baby' },
+                'combo_master': { name: 'Mestre do Combo', description: 'Alcance combo x10', icon: 'fa-fire' },
+                'element_collector': { name: 'Colecionador', description: 'Descubra 50 elementos', icon: 'fa-gem' },
+                'mystic_master': { name: 'Mestre Místico', description: 'Descubra todos os elementos místicos', icon: 'fa-hat-wizard' },
+                'speed_demon': { name: 'Demônio da Velocidade', description: 'Faça 10 combinações em 1 minuto', icon: 'fa-bolt' },
+                'perfectionist': { name: 'Perfeccionista', description: 'Complete o jogo sem usar dicas', icon: 'fa-star' },
+                'cosmic_creator': { name: 'Criador Cósmico', description: 'Crie o universo', icon: 'fa-globe' },
+            };
+            
+            const totalPossibleElements = Object.keys(initialElements).length + new Set(Object.values(recipes).map(r => r.name)).size;
+
+            // --- ELEMENTOS DO DOM ---
+            const elementsContainer = document.getElementById('elements-container');
+            const beaker = document.getElementById('beaker');
+            const beakerContent = document.getElementById('beaker-content');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const elementCountSpan = document.getElementById('element-count');
+            const resetButton = document.getElementById('reset-button');
+            const hintButton = document.getElementById('hint-button');
+            const powerButton = document.getElementById('power-button');
+            const menuButton = document.getElementById('menu-button');
+            const scrollToTopButton = document.getElementById('scroll-to-top');
+            const menuModal = document.getElementById('menu-modal');
+            const closeMenu = document.getElementById('close-menu');
+            const achievementPopup = document.getElementById('achievement-popup');
+            const achievementText = document.getElementById('achievement-text');
+            const comboMeter = document.getElementById('combo-meter');
+            const playerLevel = document.getElementById('player-level');
+            const xpBar = document.getElementById('xp-bar');
+            const comboCount = document.getElementById('combo-count');
+            const filterBtn = document.getElementById('filter-btn');
+
+            // --- ESTADO DO JOGO ---
+            let elementsInBeaker = [];
+            let discoveredElements = {};
+            let usedHints = new Set();
+            let playerStats = {
+                level: 1,
+                xp: 0,
+                xpToNext: 100,
+                combo: 1,
+                totalCombinations: 0,
+                achievements: new Set(),
+                startTime: Date.now(),
+                lastCombinationTime: 0,
+                speedCombos: 0,
+                hintsUsed: 0
+            };
+            let particles = [];
+            let powerUps = [];
+            let isDarkMode = false;
+            let filterCategory = null;
+
+            // --- FUNÇÕES PRINCIPAIS ---
+            function saveProgress() {
+                const saveData = {
+                    discoveredElements,
+                    usedHints: [...usedHints],
+                    playerStats: {
+                        ...playerStats,
+                        achievements: [...playerStats.achievements]
+                    }
+                };
+                localStorage.setItem('alquimista_mestre_save', JSON.stringify(saveData));
+                
+                // Salvar na nuvem (simulado)
+                if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                    console.log('Salvando na nuvem...');
+                }
+            }
+
+            function loadProgress() {
+                const saved = localStorage.getItem('alquimista_mestre_save');
+                if (saved) {
+                    const saveData = JSON.parse(saved);
+                    discoveredElements = saveData.discoveredElements || { ...initialElements };
+                    usedHints = new Set(saveData.usedHints || []);
+                    playerStats = {
+                        ...playerStats,
+                        ...saveData.playerStats,
+                        achievements: new Set(saveData.playerStats?.achievements || [])
+                    };
+                } else {
+                    discoveredElements = { ...initialElements };
+                }
+                updateUI();
+                musicSystem.setLevel(playerStats.level);
+            }
+
+            function resetProgress() {
+                if (confirm("Tem certeza que deseja apagar todo o progresso? Esta ação não pode ser desfeita!")) {
+                    localStorage.removeItem('alquimista_mestre_save');
+                    discoveredElements = { ...initialElements };
+                    usedHints = new Set();
+                    playerStats = {
+                        level: 1,
+                        xp: 0,
+                        xpToNext: 100,
+                        combo: 1,
+                        totalCombinations: 0,
+                        achievements: new Set(),
+                        startTime: Date.now(),
+                        lastCombinationTime: 0,
+                        speedCombos: 0,
+                        hintsUsed: 0
+                    };
+                    elementsInBeaker = [];
+                    updateBeakerVisuals();
+                    renderElements();
+                    updateUI();
+                    musicSystem.setLevel(1);
+                    feedbackMessage.textContent = "Jogo reiniciado!";
+                    setTimeout(() => feedbackMessage.textContent = '', 2000);
+                }
+            }
+
+            function createElementCard(name, emoji) {
+                const card = document.createElement('div');
+                card.className = 'element-card bg-gray-900/50 backdrop-blur-sm p-3 rounded-xl flex flex-col items-center justify-center text-center aspect-square';
+                card.draggable = true;
+                card.dataset.name = name;
+
+                const emojiSpan = document.createElement('span');
+                emojiSpan.className = 'element-emoji';
+                emojiSpan.textContent = emoji;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'mt-1 text-xs md:text-sm font-semibold capitalize break-words w-full';
+                nameSpan.textContent = name;
+
+                card.appendChild(emojiSpan);
+                card.appendChild(nameSpan);
+
+                // Event Listeners
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('click', () => handleElementSelection(name));
+                card.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleElementSelection(name);
+                }, { passive: false });
+
+                return card;
+            }
+
+            function renderElements() {
+                elementsContainer.innerHTML = '';
+                
+                Object.keys(elementCategories).forEach(categoryKey => {
+                    const category = elementCategories[categoryKey];
+                    const categoryElements = category.elements.filter(el => 
+                        discoveredElements[el] && (!filterCategory || filterCategory === categoryKey)
+                    );
+                    
+                    if (categoryElements.length > 0) {
+                        const categoryHeader = document.createElement('div');
+                        categoryHeader.className = `category-header ${category.color}`;
+                        categoryHeader.innerHTML = `<i class="fas ${category.icon} category-icon"></i> ${categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1)}`;
+                        elementsContainer.appendChild(categoryHeader);
+                        
+                        categoryElements.forEach(elementName => {
+                            const card = createElementCard(elementName, discoveredElements[elementName]);
+                            elementsContainer.appendChild(card);
+                        });
+                    }
+                });
+                
+                updateElementCount();
+                checkWinCondition();
+            }
+
+            function updateElementCount() {
+                const count = Object.keys(discoveredElements).length;
+                elementCountSpan.textContent = `${count} / ${totalPossibleElements}`;
+            }
+
+            function updateUI() {
+                playerLevel.textContent = playerStats.level;
+                comboCount.textContent = `x${playerStats.combo}`;
+                const xpPercent = (playerStats.xp / playerStats.xpToNext) * 100;
+                xpBar.style.width = xpPercent + '%';
+            }
+
+            function addXP(amount) {
+                playerStats.xp += amount;
+                
+                while (playerStats.xp >= playerStats.xpToNext) {
+                    playerStats.xp -= playerStats.xpToNext;
+                    playerStats.level++;
+                    playerStats.xpToNext = Math.floor(playerStats.xpToNext * 1.5);
+                    showAchievement('level_up', `Nível ${playerStats.level} alcançado!`);
+                    createConfetti();
+                    musicSystem.setLevel(playerStats.level);
+                }
+                
+                updateUI();
+            }
+
+            function handleElementSelection(elementName) {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(10);
+                }
+                
+                if (elementsInBeaker.includes(elementName)) {
+                    elementsInBeaker = elementsInBeaker.filter(el => el !== elementName);
+                    document.querySelector(`[data-name="${elementName}"]`)?.classList.remove('selected');
+                } else if (elementsInBeaker.length < 2) {
+                    elementsInBeaker.push(elementName);
+                    document.querySelector(`[data-name="${elementName}"]`)?.classList.add('selected');
+                }
+                
+                updateBeakerVisuals();
+
+                if (elementsInBeaker.length === 2) {
+                    setTimeout(combineElements, 300);
+                }
+            }
+
+            function combineElements() {
+                const key1 = `${elementsInBeaker[0]}+${elementsInBeaker[1]}`;
+                const key2 = `${elementsInBeaker[1]}+${elementsInBeaker[0]}`;
+                const result = recipes[key1] || recipes[key2];
+                
+                // Limpar seleção visual
+                elementsInBeaker.forEach(name => {
+                    document.querySelector(`[data-name="${name}"]`)?.classList.remove('selected');
+                });
+
+                if (result) {
+                    const isNewDiscovery = !discoveredElements[result.name];
+                    
+                    // Sistema de combo
+                    const now = Date.now();
+                    if (now - playerStats.lastCombinationTime < 5000) {
+                        playerStats.combo = Math.min(playerStats.combo + 1, 10);
+                        if (playerStats.combo > 5) {
+                            showCombo(playerStats.combo);
+                        }
+                    } else {
+                        playerStats.combo = 1;
+                    }
+                    playerStats.lastCombinationTime = now;
+                    
+                    // Sistema de velocidade
+                    if (now - playerStats.lastCombinationTime < 1000) {
+                        playerStats.speedCombos++;
+                        if (playerStats.speedCombos >= 10) {
+                            unlockAchievement('speed_demon');
+                        }
+                    } else {
+                        playerStats.speedCombos = 1;
+                    }
+                    
+                    // Feedback visual
+                    feedbackMessage.textContent = `Você criou ${result.name}!`;
+                    musicSystem.playSuccessSound();
+                    
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(100);
+                    }
+                    
+                    // Criar partículas
+                    const rect = beaker.getBoundingClientRect();
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            createParticle(
+                                rect.left + rect.width / 2 + (Math.random() - 0.5) * 100,
+                                rect.top + rect.height / 2,
+                                result.emoji
+                            );
+                        }, i * 50);
+                    }
+                    
+                    if (isNewDiscovery) {
+                        discoveredElements[result.name] = result.emoji;
+                        addXP(result.xp * playerStats.combo);
+                        playerStats.totalCombinations++;
+                        
+                        // Verificar conquistas
+                        if (playerStats.totalCombinations === 1) {
+                            unlockAchievement('first_combination');
+                        }
+                        if (playerStats.combo >= 10) {
+                            unlockAchievement('combo_master');
+                        }
+                        if (Object.keys(discoveredElements).length >= 50) {
+                            unlockAchievement('element_collector');
+                        }
+                        if (result.name === 'universo') {
+                            unlockAchievement('cosmic_creator');
+                        }
+                        
+                        saveProgress();
+                        renderElements();
+                        
+                        // Destacar novo elemento
+                        const newCard = document.querySelector(`[data-name="${result.name}"]`);
+                        if (newCard) {
+                            newCard.classList.add('newly-discovered', 'glow');
+                            newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            setTimeout(() => {
+                                newCard.classList.remove('glow');
+                            }, 3000);
+                        }
+                    }
+                } else {
+                    feedbackMessage.textContent = 'Combinação inválida!';
+                    musicSystem.playErrorSound();
+                    
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(200);
+                    }
+                    
+                    beaker.classList.add('shake');
+                    beaker.addEventListener('animationend', () => beaker.classList.remove('shake'), { once: true });
+                    playerStats.combo = 1;
+                }
+
+                setTimeout(() => {
+                    elementsInBeaker = [];
+                    updateBeakerVisuals();
+                    feedbackMessage.textContent = '';
+                }, 1500);
+                
+                updateUI();
+            }
+
+            function showCombo(combo) {
+                comboMeter.textContent = `COMBO x${combo}!`;
+                comboMeter.classList.add('show');
+                setTimeout(() => comboMeter.classList.remove('show'), 1000);
+            }
+
+            function unlockAchievement(achievementId) {
+                if (!playerStats.achievements.has(achievementId)) {
+                    playerStats.achievements.add(achievementId);
+                    const achievement = achievements[achievementId];
+                    showAchievement(achievementId, achievement.description);
+                    musicSystem.playAchievementSound();
+                    addXP(100);
+                    saveProgress();
+                }
+            }
+
+            function showAchievement(achievementId, text) {
+                achievementText.textContent = text;
+                achievementPopup.classList.add('show');
+                
+                setTimeout(() => {
+                    achievementPopup.classList.remove('show');
+                }, 3000);
+            }
+
+            function checkWinCondition() {
+                if (Object.keys(discoveredElements).length === totalPossibleElements) {
+                    feedbackMessage.innerHTML = `<span class="win-message text-green-400">Parabéns! Você se tornou o Mestre Alquimista Supremo!</span>`;
+                    createConfetti();
+                    unlockAchievement('perfectionist');
+                }
+            }
+
+            function showHint() {
+                playerStats.hintsUsed++;
+                
+                const possibleCombinations = [];
+                
+                Object.keys(recipes).forEach(key => {
+                    const [elem1, elem2] = key.split('+');
+                    const result = recipes[key];
+                    
+                    if (discoveredElements[elem1] && discoveredElements[elem2] && !discoveredElements[result.name] && !usedHints.has(key)) {
+                        possibleCombinations.push({ elem1, elem2, result, key });
+                    }
+                });
+                
+                if (possibleCombinations.length === 0) {
+                    feedbackMessage.textContent = 'Não há mais dicas disponíveis!';
+                    setTimeout(() => feedbackMessage.textContent = '', 2000);
+                    return;
+                }
+                
+                const randomHint = possibleCombinations[Math.floor(Math.random() * possibleCombinations.length)];
+                usedHints.add(randomHint.key);
+                
+                feedbackMessage.textContent = `Dica: Tente combinar ${randomHint.elem1} com ${randomHint.elem2}`;
+                
+                // Destacar elementos
+                const card1 = document.querySelector(`[data-name="${randomHint.elem1}"]`);
+                const card2 = document.querySelector(`[data-name="${randomHint.elem2}"]`);
+                
+                if (card1) card1.classList.add('glow');
+                if (card2) card2.classList.add('glow');
+                
+                setTimeout(() => {
+                    if (card1) card1.classList.remove('glow');
+                    if (card2) card2.classList.remove('glow');
+                    feedbackMessage.textContent = '';
+                }, 3000);
+                
+                saveProgress();
+            }
+
+            function activatePowerUp() {
+                if (playerStats.level < 5) {
+                    feedbackMessage.textContent = 'Nível 5 necessário para poderes cósmicos!';
+                    return;
+                }
+                
+                // Revelar 3 combinações aleatórias
+                const possibleCombinations = [];
+                Object.keys(recipes).forEach(key => {
+                    const [elem1, elem2] = key.split('+');
+                    const result = recipes[key];
+                    if (discoveredElements[elem1] && discoveredElements[elem2] && !discoveredElements[result.name]) {
+                        possibleCombinations.push({ elem1, elem2, result });
+                    }
+                });
+                
+                if (possibleCombinations.length > 0) {
+                    const revealed = possibleCombinations.sort(() => Math.random() - 0.5).slice(0, 3);
+                    feedbackMessage.textContent = 'Poder cósmico ativado! Combinações reveladas:';
+                    
+                    revealed.forEach((combo, index) => {
+                        setTimeout(() => {
+                            const card1 = document.querySelector(`[data-name="${combo.elem1}"]`);
+                            const card2 = document.querySelector(`[data-name="${combo.elem2}"]`);
+                            
+                            if (card1) card1.classList.add('glow');
+                            if (card2) card2.classList.add('glow');
+                            
+                            setTimeout(() => {
+                                if (card1) card1.classList.remove('glow');
+                                if (card2) card2.classList.remove('glow');
+                            }, 2000);
+                        }, index * 500);
+                    });
+                    
+                    setTimeout(() => {
+                        feedbackMessage.textContent = '';
+                    }, 4000);
+                }
+            }
+
+            // --- HANDLERS DE DRAG & DROP ---
+            function handleDragStart(event) {
+                event.dataTransfer.setData('text/plain', event.target.dataset.name);
+                event.dataTransfer.effectAllowed = 'move';
+            }
+
+            function handleDragOver(event) {
+                event.preventDefault();
+                beaker.classList.add('drag-over');
+            }
+
+            function handleDragLeave() {
+                beaker.classList.remove('drag-over');
+            }
+
+            function handleDrop(event) {
+                event.preventDefault();
+                beaker.classList.remove('drag-over');
+                const elementName = event.dataTransfer.getData('text/plain');
+                handleElementSelection(elementName);
+            }
+
+            function updateBeakerVisuals() {
+                beakerContent.innerHTML = '';
+                elementsInBeaker.forEach(name => {
+                    const emojiSpan = document.createElement('span');
+                    emojiSpan.textContent = discoveredElements[name];
+                    beakerContent.appendChild(emojiSpan);
+                });
+            }
+
+            function scrollToTop() {
+                elementsContainer.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            function handleScroll() {
+                if (elementsContainer.scrollTop > 300) {
+                    scrollToTopButton.style.opacity = '1';
+                    scrollToTopButton.style.visibility = 'visible';
+                } else {
+                    scrollToTopButton.style.opacity = '0';
+                    scrollToTopButton.style.visibility = 'hidden';
+                }
+            }
+
+            function toggleDarkMode() {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode');
+            }
+
+            function shareProgress() {
+                const text = `Estou jogando Alquimista Mestre! Já descobri ${Object.keys(discoveredElements).length} elementos e alcancei o nível ${playerStats.level}!`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Alquimista Mestre',
+                        text: text,
+                        url: window.location.href
+                    });
+                } else {
+                    navigator.clipboard.writeText(text).then(() => {
+                        feedbackMessage.textContent = 'Progresso copiado para a área de transferência!';
+                        setTimeout(() => feedbackMessage.textContent = '', 2000);
+                    });
+                }
+            }
+
+            // --- SISTEMA DE PARTÍCULAS ---
+            function createParticle(x, y, emoji) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = emoji;
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.fontSize = Math.random() * 20 + 20 + 'px';
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 3000);
+            }
+
+            function createConfetti() {
+                const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+                
+                for (let i = 0; i < 150; i++) {
+                    setTimeout(() => {
+                        const confettiPiece = document.createElement('div');
+                        confettiPiece.className = 'confetti';
+                        confettiPiece.style.left = Math.random() * 100 + '%';
+                        confettiPiece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confettiPiece.style.width = Math.random() * 10 + 5 + 'px';
+                        confettiPiece.style.height = Math.random() * 10 + 5 + 'px';
+                        confettiPiece.style.opacity = Math.random();
+                        document.body.appendChild(confettiPiece);
+                        
+                        setTimeout(() => confettiPiece.remove(), 3000);
+                    }, i * 20);
+                }
+            }
+
+            // --- EVENT LISTENERS ---
+            beaker.addEventListener('dragover', handleDragOver);
+            beaker.addEventListener('dragleave', handleDragLeave);
+            beaker.addEventListener('drop', handleDrop);
+            resetButton.addEventListener('click', resetProgress);
+            hintButton.addEventListener('click', showHint);
+            powerButton.addEventListener('click', activatePowerUp);
+            menuButton.addEventListener('click', () => menuModal.classList.add('show'));
+            closeMenu.addEventListener('click', () => menuModal.classList.remove('show'));
+            scrollToTopButton.addEventListener('click', scrollToTop);
+            elementsContainer.addEventListener('scroll', handleScroll);
+            filterBtn.addEventListener('click', () => {
+                const categories = [null, ...Object.keys(elementCategories)];
+                const currentIndex = categories.indexOf(filterCategory);
+                filterCategory = categories[(currentIndex + 1) % categories.length];
+                renderElements();
+            });
+
+            // Menu items
+            document.querySelectorAll('.menu-item').forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    switch(index) {
+                        case 0: // Conquistas
+                            showAchievements();
+                            break;
+                        case 1: // Estatísticas
+                            showStatistics();
+                            break;
+                        case 2: // Modo noturno
+                            toggleDarkMode();
+                            break;
+                        case 3: // Compartilhar
+                            shareProgress();
+                            break;
+                    }
+                    menuModal.classList.remove('show');
+                });
+            });
+
+            function showAchievements() {
+                let achievementsList = '<h3 class="text-xl font-bold mb-4">Conquistas</h3><div class="space-y-2">';
+                
+                Object.entries(achievements).forEach(([id, achievement]) => {
+                    const unlocked = playerStats.achievements.has(id);
+                    achievementsList += `
+                        <div class="flex items-center gap-3 p-3 rounded-lg ${unlocked ? 'bg-green-900/30' : 'bg-gray-700/50'}">
+                            <i class="fas ${achievement.icon} text-2xl ${unlocked ? 'text-yellow-400' : 'text-gray-500'}"></i>
+                            <div class="flex-1">
+                                <h4 class="font-semibold ${unlocked ? 'text-white' : 'text-gray-400'}">${achievement.name}</h4>
+                                <p class="text-sm ${unlocked ? 'text-gray-300' : 'text-gray-500'}">${achievement.description}</p>
+                            </div>
+                            ${unlocked ? '<i class="fas fa-check text-green-400"></i>' : '<i class="fas fa-lock text-gray-500"></i>'}
+                        </div>
+                    `;
+                });
+                
+                achievementsList += '</div>';
+                showModal(achievementsList);
+            }
+
+            function showStatistics() {
+                const playTime = Math.floor((Date.now() - playerStats.startTime) / 1000);
+                const hours = Math.floor(playTime / 3600);
+                const minutes = Math.floor((playTime % 3600) / 60);
+                
+                const statsHTML = `
+                    <h3 class="text-xl font-bold mb-4">Estatísticas</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>Tempo de Jogo</span>
+                                <span class="font-bold">${hours}h ${minutes}m</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>Combinações Totais</span>
+                                <span class="font-bold">${playerStats.totalCombinations}</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>Maior Combo</span>
+                                <span class="font-bold">x${playerStats.combo}</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>Dicas Usadas</span>
+                                <span class="font-bold">${playerStats.hintsUsed}</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span>Progresso</span>
+                                <span class="font-bold">${Math.floor((Object.keys(discoveredElements).length / totalPossibleElements) * 100)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                showModal(statsHTML);
+            }
+
+            function showModal(content) {
+                const modal = document.createElement('div');
+                modal.className = 'modal show';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        ${content}
+                        <button class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors" onclick="this.closest('.modal').remove()">
+                            Fechar
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+
+            // --- INICIALIZAÇÃO ---
+            loadProgress();
+            renderElements();
+
+            // Suporte a gestos
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // Detectar swipe para baixo para resetar
+                if (deltaY > 100 && Math.abs(deltaX) < 50) {
+                    if (confirm('Deseja reiniciar o jogo?')) {
+                        resetProgress();
+                    }
+                }
+            });
+
+            // Auto-save periódico
+            setInterval(saveProgress, 30000);
+
+            // Verificar conquistas periódicas
+            setInterval(() => {
+                const mysticElements = elementCategories.místicos.elements.filter(el => discoveredElements[el]);
+                if (mysticElements.length === elementCategories.místicos.elements.length) {
+                    unlockAchievement('mystic_master');
+                }
+            }, 5000);
+
+            // Iniciar música após interação do usuário (requerimento dos navegadores)
+            document.addEventListener('click', function initMusic() {
+                // Não iniciar música automaticamente, deixar o usuário decidir
+                document.removeEventListener('click', initMusic);
+            }, { once: true });
+
+            console.log('🎮 Alquimista Mestre: A Jornada Cósmica carregado com sucesso!');
+            console.log('🎵 Sistema de música 16-bit integrado!');
+            console.log('🌟 Boa sorte na sua jornada para se tornar o Mestre Alquimista Supremo!');
+        });
+    </script>
+</body>
+</html>
