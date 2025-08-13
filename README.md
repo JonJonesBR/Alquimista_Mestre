@@ -6,6 +6,8 @@ Bem-vindo ao Alquimista Mestre: A Jornada Cósmica! Um jogo de alquimia viciante
 
 Este projeto foi criado como um jogo de navegador single-page, utilizando HTML, Tailwind CSS e JavaScript puro, com um toque especial de um sistema de som 16-bit gerado dinamicamente com Tone.js.
 
+![Imagem do Jogo Alquimista Mestre](https://raw.githubusercontent.com/JonJonesBR/Alquimista_Mestre/refs/heads/main/Imagem.png)
+
 ## 🎮 Live Demo
 
 **[Clique aqui para jogar Alquimista Mestre!](https://jonjonesbr.github.io/Alquimista_Mestre/)**
